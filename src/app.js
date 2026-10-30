@@ -1,5 +1,5 @@
 // SAGAN — Sonification of Astronomical Data
-// Minimal & Accessible Astronomy Learning Platform for Blind & Visually Impaired Students
+// Accessible Astronomy Learning Platform for Blind & Visually Impaired Students
 
 // ---------------------------------------------------------------------------
 // 1. Curriculum Chapters (7 chapters)
@@ -114,7 +114,7 @@ const chapters = [
 ];
 
 // ---------------------------------------------------------------------------
-// 2. Celestial Datasets Registry (Clean & No Emojis)
+// 2. Celestial Datasets Registry (Clean & Minimalist)
 // ---------------------------------------------------------------------------
 const CELESTIAL_DATASETS = {
   exoplanet: {
@@ -180,7 +180,7 @@ const CELESTIAL_DATASETS = {
 };
 
 // ---------------------------------------------------------------------------
-// 3. Application State & Helpers
+// 3. Application State & Text-to-Speech (Audio Dictation)
 // ---------------------------------------------------------------------------
 const $ = (id) => document.getElementById(id);
 
@@ -192,6 +192,21 @@ let currentDatasetKey = 'exoplanet';
 let isPlaying = false;
 let playheadTimer = null;
 let mysteryTarget = 'exoplanet';
+let voiceGuideEnabled = true;
+
+// Text-to-Speech narration function
+function speak(text, interrupt = true) {
+  if (!voiceGuideEnabled || !('speechSynthesis' in window)) return;
+  try {
+    if (interrupt) window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    window.speechSynthesis.speak(utterance);
+  } catch (e) {
+    // Graceful fallback if speech synthesis is blocked
+  }
+}
 
 const PENTATONIC_SCALE = [
   261.63, // C4
@@ -210,7 +225,7 @@ function getActiveDataset() {
 }
 
 // ---------------------------------------------------------------------------
-// 4. Interactive SVG Graph & Accessible Point Navigation
+// 4. Interactive SVG Graph & Accessible Navigation
 // ---------------------------------------------------------------------------
 function drawCurve() {
   const data = getActiveDataset();
@@ -223,7 +238,6 @@ function drawCurve() {
 
   $('curve-line').setAttribute('d', 'M' + points.replaceAll(' ', ' L'));
 
-  // Update SVG accessibility labels
   $('curve-title').textContent = data.title;
   $('curve-desc').textContent = data.desc;
   $('chart-description').textContent = data.desc;
@@ -232,7 +246,6 @@ function drawCurve() {
   $('axis-flux-label').textContent = data.fluxLabel;
   $('chart-provenance-note').textContent = data.provenance;
 
-  // Render interactive point targets
   const pointsContainer = $('curve-points');
   pointsContainer.innerHTML = '';
 
@@ -250,7 +263,10 @@ function drawCurve() {
     circle.setAttribute('aria-label', `Point ${i + 1} of ${curve.length}: Brightness ${(v * 100).toFixed(0)} percent`);
 
     const showPointInfo = () => {
-      $('point-details').innerHTML = `<strong>Point ${i + 1} of ${curve.length}:</strong> Brightness ${(v * 100).toFixed(0)} percent &bull; Frequency ${getNoteFrequency(v).toFixed(0)} Hz.`;
+      const pct = (v * 100).toFixed(0);
+      const freq = getNoteFrequency(v).toFixed(0);
+      $('point-details').innerHTML = `<strong>Point ${i + 1} of ${curve.length}:</strong> Brightness ${pct} percent &bull; Frequency ${freq} Hz.`;
+      speak(`Point ${i + 1}: Brightness ${pct} percent.`, true);
     };
 
     circle.addEventListener('mouseenter', showPointInfo);
@@ -284,9 +300,9 @@ function updatePlayhead(x, active) {
 }
 
 // ---------------------------------------------------------------------------
-// 5. Curriculum Navigation
+// 5. Curriculum Navigation & Voice Dictation
 // ---------------------------------------------------------------------------
-function renderChapter() {
+function renderChapter(announce = false) {
   const c = chapters[current];
   $('progress').max = chapters.length;
   $('lesson-kicker').textContent = `CHAPTER ${String(current + 1).padStart(2, '0')}`;
@@ -302,6 +318,10 @@ function renderChapter() {
     if (i === current) b.setAttribute('aria-current', 'step');
     else b.removeAttribute('aria-current');
   });
+
+  if (announce) {
+    speak(`Chapter ${current + 1}: ${c.title}. ${c.intro}`, true);
+  }
 }
 
 function buildChapterList() {
@@ -314,7 +334,7 @@ function buildChapterList() {
     b.textContent = `${String(i + 1).padStart(2, '0')} ${c.title}`;
     b.addEventListener('click', () => {
       current = i;
-      renderChapter();
+      renderChapter(true);
       $('lesson').focus({ preventScroll: true });
       $('lesson').scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
@@ -478,7 +498,7 @@ async function playAudio() {
 }
 
 // ---------------------------------------------------------------------------
-// 7. Listening Challenge (Clean & Accessible)
+// 7. Listening Challenge
 // ---------------------------------------------------------------------------
 const CHALLENGE_TARGETS = ['exoplanet', 'pulsar', 'supernova'];
 
@@ -493,6 +513,7 @@ function setupCosmicEarChallenge() {
     currentDatasetKey = mysteryTarget;
 
     feedback.textContent = 'Playing mystery sound. Select the astronomical object you think matches this pattern.';
+    speak('Playing mystery sound. Select the astronomical object that matches.', true);
     await playAudio();
 
     currentDatasetKey = savedDataset;
@@ -505,46 +526,79 @@ function setupCosmicEarChallenge() {
 
       if (guess === mysteryTarget) {
         feedback.innerHTML = `<strong>Correct detection.</strong> That was the <strong>${targetObj.name}</strong>.<br><span class="small-note">Note: ${targetObj.funFact}</span>`;
+        speak(`Correct detection. That was the ${targetObj.name}. ${targetObj.funFact}`, true);
       } else {
         feedback.innerHTML = `<strong>Not quite.</strong> Notice the sound pattern: ${targetObj.desc} Press "Play mystery sound" to listen again.`;
+        speak(`Not quite. Press Play mystery sound to listen again.`, true);
       }
     });
   });
 }
 
 // ---------------------------------------------------------------------------
-// 8. Event Listeners & Initialization
+// 8. Event Listeners & Voice Guide Initiation
 // ---------------------------------------------------------------------------
 buildChapterList();
-renderChapter();
+renderChapter(false);
 drawCurve();
 setupCosmicEarChallenge();
+
+// Voice Guide Auto-Dictation on first user interaction
+let hasWelcomed = false;
+function triggerWelcomeVoice() {
+  if (!hasWelcomed && voiceGuideEnabled) {
+    hasWelcomed = true;
+    speak('Welcome to SAGAN. Use the chapter list on the left to explore astronomy lessons, or navigate to the Sound Lab to listen to astronomical light curves.', false);
+  }
+}
+
+// Attach welcome trigger to first click or keypress
+window.addEventListener('click', triggerWelcomeVoice, { once: true });
+window.addEventListener('keydown', triggerWelcomeVoice, { once: true });
+
+// Voice Toggle button
+$('voice-toggle').addEventListener('click', () => {
+  voiceGuideEnabled = !voiceGuideEnabled;
+  $('voice-toggle').setAttribute('aria-pressed', String(voiceGuideEnabled));
+  if (voiceGuideEnabled) {
+    $('voice-toggle').textContent = 'Voice Guide: On';
+    $('voice-toggle').classList.add('voice-active');
+    speak('Voice guide turned on.', true);
+  } else {
+    $('voice-toggle').textContent = 'Voice Guide: Off';
+    $('voice-toggle').classList.remove('voice-active');
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  }
+});
 
 $('previous').addEventListener('click', () => {
   if (current > 0) {
     current--;
-    renderChapter();
+    renderChapter(true);
   }
 });
 
 $('next').addEventListener('click', () => {
   current = current === chapters.length - 1 ? 0 : current + 1;
-  renderChapter();
+  renderChapter(true);
 });
 
 $('text-smaller').addEventListener('click', () => {
   fontScale = Math.max(0.85, fontScale - 0.1);
   document.documentElement.style.fontSize = `${16 * fontScale}px`;
+  speak('Decreased text size', true);
 });
 
 $('text-larger').addEventListener('click', () => {
   fontScale = Math.min(1.5, fontScale + 0.1);
   document.documentElement.style.fontSize = `${16 * fontScale}px`;
+  speak('Increased text size', true);
 });
 
 $('contrast-toggle').addEventListener('click', () => {
   const enabled = document.body.classList.toggle('high-contrast');
   $('contrast-toggle').setAttribute('aria-pressed', String(enabled));
+  speak(enabled ? 'High contrast mode enabled' : 'Standard contrast mode enabled', true);
 });
 
 $('speed').addEventListener('input', () => {
@@ -557,6 +611,7 @@ $('dataset-select').addEventListener('change', (e) => {
   drawCurve();
   const ds = getActiveDataset();
   $('point-details').innerHTML = `Loaded <strong>${ds.name}</strong>. Press Play sonification to listen or Tab through points.`;
+  speak(`Loaded ${ds.name}. ${ds.desc}. Press Play sonification to listen.`, true);
 });
 
 $('instrument-select').addEventListener('change', () => {
@@ -567,6 +622,14 @@ $('tuning-select').addEventListener('change', () => {
   if (isPlaying) playAudio();
 });
 
-$('play-sound').addEventListener('click', playAudio);
-$('stop-sound').addEventListener('click', stopAudio);
+$('play-sound').addEventListener('click', () => {
+  speak('Playing light curve sonification.', true);
+  setTimeout(playAudio, 300);
+});
+
+$('stop-sound').addEventListener('click', () => {
+  stopAudio();
+  speak('Sound stopped.', true);
+});
+
 window.addEventListener('pagehide', stopAudio);
