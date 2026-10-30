@@ -204,7 +204,7 @@ function speak(text, interrupt = true) {
     utterance.pitch = 1.0;
     window.speechSynthesis.speak(utterance);
   } catch (e) {
-    // Graceful fallback if speech synthesis is blocked
+    // Graceful fallback
   }
 }
 
@@ -321,6 +321,8 @@ function renderChapter(announce = false) {
 
   if (announce) {
     speak(`Chapter ${current + 1}: ${c.title}. ${c.intro}`, true);
+    const bubble = $('mascot-text');
+    if (bubble) bubble.textContent = `Chapter ${current + 1}: ${c.title}`;
   }
 }
 
@@ -536,23 +538,104 @@ function setupCosmicEarChallenge() {
 }
 
 // ---------------------------------------------------------------------------
-// 8. Event Listeners & Voice Guide Initiation
+// 8. Cursor Audio Tracking (Hover-to-Read) & Mascot
+// ---------------------------------------------------------------------------
+let hoverDebounceTimer = null;
+let lastHoveredText = '';
+
+function setupCursorNarration() {
+  function handleElementHover(target) {
+    if (!voiceGuideEnabled || isPlaying) return;
+    if (!target) return;
+
+    const element = target.closest(
+      'button, a, select, input, h1, h2, h3, p, li, circle.curve-point, .mascot-avatar'
+    );
+    if (!element) return;
+
+    let textToSpeak = '';
+    const tagName = element.tagName.toLowerCase();
+
+    if (element.classList.contains('mascot-avatar')) {
+      textToSpeak = "Nova the cosmic guide. Click for an astronomy tip.";
+    } else if (tagName === 'button') {
+      textToSpeak = "Button: " + (element.getAttribute('aria-label') || element.textContent.trim());
+    } else if (tagName === 'a') {
+      textToSpeak = "Link: " + (element.getAttribute('aria-label') || element.textContent.trim());
+    } else if (tagName === 'select') {
+      const label = document.querySelector(`label[for="${element.id}"]`);
+      const labelText = label ? label.textContent.trim() : 'Option';
+      textToSpeak = `Selector: ${labelText}. Currently ${element.options[element.selectedIndex].text}`;
+    } else if (tagName === 'input' && element.type === 'range') {
+      textToSpeak = `Speed slider: currently ${element.value} times speed`;
+    } else if (tagName === 'circle' && element.classList.contains('curve-point')) {
+      textToSpeak = element.getAttribute('aria-label') || '';
+    } else if (tagName === 'h1' || tagName === 'h2' || tagName === 'h3') {
+      textToSpeak = "Heading: " + element.textContent.trim();
+    } else if (tagName === 'p' || tagName === 'li') {
+      const text = element.textContent.trim();
+      if (text.length > 0 && text.length < 350) {
+        textToSpeak = text;
+      }
+    }
+
+    if (!textToSpeak || textToSpeak === lastHoveredText) return;
+
+    clearTimeout(hoverDebounceTimer);
+    hoverDebounceTimer = setTimeout(() => {
+      lastHoveredText = textToSpeak;
+      speak(textToSpeak, true);
+      const mascotBubble = $('mascot-text');
+      if (mascotBubble) {
+        mascotBubble.textContent = textToSpeak;
+      }
+    }, 140);
+  }
+
+  document.addEventListener('mouseover', (e) => {
+    handleElementHover(e.target);
+  });
+
+  document.addEventListener('focusin', (e) => {
+    handleElementHover(e.target);
+  });
+
+  // Mascot interactive tips
+  const mascotAvatar = document.querySelector('.mascot-avatar');
+  if (mascotAvatar) {
+    const mascotTips = [
+      "Light curves let us discover worlds orbiting stars millions of light-years away!",
+      "A pulsar spins so fast it acts like a cosmic clock ticking in space.",
+      "In the Sound Lab, select Harmonious Scale to hear starlight play musical notes!",
+      "Move your mouse or press Tab to hear any text on the screen dictated aloud."
+    ];
+    mascotAvatar.addEventListener('click', () => {
+      const randomTip = mascotTips[Math.floor(Math.random() * mascotTips.length)];
+      const bubble = $('mascot-text');
+      if (bubble) bubble.textContent = randomTip;
+      speak(`Nova says: ${randomTip}`, true);
+    });
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 9. Event Listeners & Voice Guide Initiation
 // ---------------------------------------------------------------------------
 buildChapterList();
 renderChapter(false);
 drawCurve();
 setupCosmicEarChallenge();
+setupCursorNarration();
 
 // Voice Guide Auto-Dictation on first user interaction
 let hasWelcomed = false;
 function triggerWelcomeVoice() {
   if (!hasWelcomed && voiceGuideEnabled) {
     hasWelcomed = true;
-    speak('Welcome to SAGAN. Use the chapter list on the left to explore astronomy lessons, or navigate to the Sound Lab to listen to astronomical light curves.', false);
+    speak('Welcome to SAGAN. Use the chapter list on the left to explore astronomy lessons, or navigate to the Sound Lab to listen to astronomical light curves. Move your cursor over any element to hear it dictated aloud.', false);
   }
 }
 
-// Attach welcome trigger to first click or keypress
 window.addEventListener('click', triggerWelcomeVoice, { once: true });
 window.addEventListener('keydown', triggerWelcomeVoice, { once: true });
 
@@ -563,7 +646,7 @@ $('voice-toggle').addEventListener('click', () => {
   if (voiceGuideEnabled) {
     $('voice-toggle').textContent = 'Voice Guide: On';
     $('voice-toggle').classList.add('voice-active');
-    speak('Voice guide turned on.', true);
+    speak('Voice guide turned on. Hover anywhere to hear text dictated.', true);
   } else {
     $('voice-toggle').textContent = 'Voice Guide: Off';
     $('voice-toggle').classList.remove('voice-active');
