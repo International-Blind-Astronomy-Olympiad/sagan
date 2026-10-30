@@ -3,21 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101722">
-  <meta name="description" content="SAGAN is an open-source astronomy learning platform for kids and learners to explore light curves and celestial data through music and sound.">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="SAGAN is an open-source, accessible astronomy learning platform for blind and visually impaired students to explore astronomy through sound and text.">
 
   <!-- Open Graph / social sharing -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="SAGAN — Learn astronomy by reading and listening">
-  <meta property="og:description" content="A chapter-by-chapter learning space for students of every age. Explore light curves, exoplanets, and data sonification — visually and through sound.">
-  <meta property="og:image" content="https://raw.githubusercontent.com/sagan-edu/sagan/main/src/og-image.png">
-  <meta property="og:url" content="https://sagan-edu.github.io/sagan/">
+  <meta property="og:description" content="A minimal, accessible learning space for students. Explore light curves, exoplanets, and data sonification through text and sound.">
+  <meta property="og:image" content="https://raw.githubusercontent.com/International-Blind-Astronomy-Olympiad/sagan/main/src/og-image.png">
+  <meta property="og:url" content="https://international-blind-astronomy-olympiad.github.io/sagan/">
 
   <!-- Twitter / X card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="SAGAN — Learn astronomy by reading and listening">
-  <meta name="twitter:description" content="A chapter-by-chapter learning space for students of every age. Explore light curves, exoplanets, and data sonification — visually and through sound.">
-  <meta name="twitter:image" content="https://raw.githubusercontent.com/sagan-edu/sagan/main/src/og-image.png">
+  <meta name="twitter:description" content="A minimal, accessible learning space for students. Explore light curves, exoplanets, and data sonification through text and sound.">
 
   <title>SAGAN — Learn astronomy by reading and listening</title>
   <link rel="stylesheet" href="styles.css">
@@ -25,20 +24,21 @@
 </head>
 <body>
   <a class="skip-link" href="#lesson">Skip to lesson</a>
+  
   <header class="site-header">
     <a class="brand" href="#home" aria-label="SAGAN home">
-      <span class="brand-mark" aria-hidden="true">S</span>
-      <span><strong>SAGAN</strong><small>Sonification of Astronomical Data</small></span>
+      <strong>SAGAN</strong>
+      <small>Sonification of Astronomical Data</small>
     </a>
     <nav aria-label="Main navigation">
       <a href="#curriculum">Curriculum</a>
       <a href="#lab">Sound lab</a>
-      <a href="#challenge">Cosmic Ear Quiz</a>
+      <a href="#challenge">Listening Quiz</a>
       <a href="#about">About</a>
       <a href="curriculum/README.md">Lesson map</a>
     </nav>
-    <div class="display-controls">
-      <button id="text-smaller" type="button" aria-label="Decrease text size">A−</button>
+    <div class="display-controls" aria-label="Accessibility options">
+      <button id="text-smaller" type="button" aria-label="Decrease text size">A-</button>
       <button id="text-larger" type="button" aria-label="Increase text size">A+</button>
       <button id="contrast-toggle" type="button" aria-pressed="false">High contrast</button>
     </div>
@@ -46,16 +46,14 @@
 
   <main id="home">
     <section class="hero" aria-labelledby="hero-title">
-      <p class="eyebrow">OPEN-SOURCE ASTRONOMY &amp; MUSIC LEARNING</p>
-      <h1 id="hero-title">Explore the universe.<br><span>Read the data. Hear the patterns.</span></h1>
-      <p class="hero-copy">A chapter-by-chapter learning space where kids and students explore stars, planets, and distant cosmos through evidence you can see visually and hear musically.</p>
-      <a class="primary-button" href="#curriculum">Start learning <span aria-hidden="true">→</span></a>
-      <p class="status-note"><strong>Early prototype:</strong> Educational models and illustrative light curves designed for accessible learning.</p>
+      <p class="eyebrow">Accessible Astronomy Curriculum</p>
+      <h1 id="hero-title">Explore the universe through data and sound.</h1>
+      <p class="hero-copy">Designed for blind and visually impaired students to explore stars, exoplanets, and cosmic events using screen-reader accessible text and data sonification.</p>
+      <a class="primary-button" href="#curriculum">Start reading</a>
     </section>
 
     <section class="layout" id="curriculum" aria-label="Learning area">
       <aside class="chapter-panel" aria-label="Course chapters">
-        <p class="eyebrow">YOUR LEARNING PATH</p>
         <h2>Chapters</h2>
         <ol id="chapter-list"></ol>
         <div class="progress-wrap">
@@ -73,17 +71,17 @@
         <p id="lesson-intro" class="lead"></p>
         <div id="lesson-body"></div>
         <div class="lesson-nav">
-          <button id="previous" type="button" disabled>← Previous</button>
-          <button id="next" class="primary-button" type="button">Next chapter →</button>
+          <button id="previous" type="button" disabled>Previous chapter</button>
+          <button id="next" class="primary-button" type="button">Next chapter</button>
         </div>
       </article>
     </section>
 
     <section id="lab" class="lab-section" aria-labelledby="lab-title">
       <div class="section-heading">
-        <p class="eyebrow">INTERACTIVE CELESTIAL SOUND LAB</p>
+        <p class="eyebrow">Interactive Sound Lab</p>
         <h2 id="lab-title">Listen to a light curve</h2>
-        <p>Choose a cosmic object below to see how its brightness changes over time and hear it translated into musical sound. Click or hover any point on the graph to hear its individual note!</p>
+        <p>A light curve records brightness changes over time. Select an astronomical object below to hear its brightness mapped directly to musical sound. You can also tab or click any point on the chart to hear its individual pitch.</p>
       </div>
 
       <div class="lab-grid">
@@ -101,104 +99,88 @@
             <path id="curve-line" class="curve-line" d=""/>
             <line id="playhead" class="playhead-line" x1="60" y1="25" x2="60" y2="225"/>
             <g id="curve-points"></g>
-            <text id="axis-time-label" x="335" y="254" text-anchor="middle">Time →</text>
+            <text id="axis-time-label" x="335" y="254" text-anchor="middle">Time</text>
             <text id="axis-flux-label" transform="translate(18 130) rotate(-90)" text-anchor="middle">Relative brightness</text>
           </svg>
 
           <div id="point-details" class="point-badge" aria-live="polite">
-            Hover or click any data point on the curve to inspect its values and hear its tone.
+            Use Tab or click any point on the chart to hear its pitch and inspect values.
           </div>
 
-          <p class="small-note" id="chart-provenance-note">Educational illustration only · not a measured star or exoplanet.</p>
+          <p class="small-note" id="chart-provenance-note">Educational model for accessible learning.</p>
         </div>
 
         <div class="sound-card">
-          <h3>Hear the pattern</h3>
-          <p>Brightness is mapped to musical pitch. As brightness dips or peaks, the notes follow the cosmic story!</p>
+          <h3>Audio controls</h3>
+          <p>Higher brightness corresponds to higher pitch. Dips in brightness produce lower pitches.</p>
 
-          <label for="dataset-select">Cosmic object</label>
+          <label for="dataset-select">Astronomical object</label>
           <select id="dataset-select">
-            <option value="exoplanet">🪐 Exoplanet Transit (Dipping star)</option>
-            <option value="pulsar">⏳ Pulsar Lighthouse (Rhythmic pulse)</option>
-            <option value="cepheid">✨ Cepheid Variable (Cosmic heartbeat)</option>
-            <option value="supernova">💥 Supernova Flare (Exploding star)</option>
-            <option value="binary">🎶 Eclipsing Binary Stars (Cosmic waltz)</option>
+            <option value="exoplanet">Exoplanet Transit (Dipping star)</option>
+            <option value="pulsar">Pulsar Lighthouse (Rhythmic pulse)</option>
+            <option value="cepheid">Cepheid Variable (Pulsating star)</option>
+            <option value="supernova">Supernova Flare (Exploding star)</option>
+            <option value="binary">Eclipsing Binary Stars (Two orbiting stars)</option>
           </select>
 
-          <label for="instrument-select">Musical instrument</label>
+          <label for="instrument-select">Tone type</label>
           <select id="instrument-select">
-            <option value="chime">🔔 Celestial Chimes / Bells (Gentle &amp; Clear)</option>
-            <option value="synth">🌟 Cosmic Synth (Clean Waveform)</option>
-            <option value="organ">🪐 Deep Space Organ (Warm Harmonics)</option>
+            <option value="chime">Clear Acoustic Chime</option>
+            <option value="synth">Pure Sine Tone</option>
+            <option value="organ">Warm Harmonic Tone</option>
           </select>
 
-          <label for="tuning-select">Musical tuning</label>
+          <label for="tuning-select">Pitch mapping</label>
           <select id="tuning-select">
-            <option value="pentatonic">🎵 Pentatonic Melody (Harmonious C-Major Scale)</option>
-            <option value="continuous">🔬 Continuous Pitch (Scientific Frequency)</option>
+            <option value="pentatonic">Harmonious Scale (Musical notes)</option>
+            <option value="continuous">Continuous Pitch (Direct frequency)</option>
           </select>
 
-          <label for="speed">Playback speed <span id="speed-label">1×</span></label>
+          <label for="speed">Playback speed <span id="speed-label">1x</span></label>
           <input id="speed" type="range" min="0.5" max="2" step="0.5" value="1">
 
           <div class="button-group">
-            <button id="play-sound" class="primary-button" type="button">▶ Play sonification</button>
-            <button id="stop-sound" type="button">■ Stop</button>
+            <button id="play-sound" class="primary-button" type="button">Play sonification</button>
+            <button id="stop-sound" type="button">Stop</button>
           </div>
 
           <p id="audio-status" class="small-note" role="status" aria-live="polite">Audio starts only when you activate playback.</p>
         </div>
       </div>
 
-      <!-- Kids Interactive Listening Mini-Game -->
+      <!-- Listening Challenge -->
       <div id="challenge" class="quiz-section" aria-labelledby="quiz-title">
-        <div class="quiz-heading">
-          <span style="font-size: 1.6rem;" aria-hidden="true">🎧</span>
-          <h3 id="quiz-title">Cosmic Ear Challenge: Test your astronomy ears!</h3>
-        </div>
-        <p>Can you identify the cosmic object just by listening to its sound? Press the button below to hear a mystery celestial sound, then make your best scientific guess!</p>
+        <h3 id="quiz-title">Cosmic Ear Challenge</h3>
+        <p>Listen to a mystery astronomical sound and identify the object based on its rhythm and pitch profile.</p>
         
         <div>
-          <button id="play-mystery" class="primary-button" type="button">🎵 Play Mystery Cosmic Sound</button>
+          <button id="play-mystery" class="primary-button" type="button">Play mystery sound</button>
         </div>
 
         <div class="quiz-options">
-          <button class="guess-btn" type="button" data-guess="exoplanet">🪐 Exoplanet Transit</button>
-          <button class="guess-btn" type="button" data-guess="pulsar">⏳ Pulsar Lighthouse</button>
-          <button class="guess-btn" type="button" data-guess="supernova">💥 Exploding Supernova</button>
+          <button class="guess-btn" type="button" data-guess="exoplanet">Exoplanet Transit</button>
+          <button class="guess-btn" type="button" data-guess="pulsar">Pulsar Lighthouse</button>
+          <button class="guess-btn" type="button" data-guess="supernova">Exploding Supernova</button>
         </div>
 
         <div id="quiz-feedback" class="quiz-feedback" aria-live="polite">
-          Click "Play Mystery Cosmic Sound" above to start the challenge!
+          Press "Play mystery sound" to start.
         </div>
       </div>
     </section>
 
     <section id="about" class="about-section">
-      <p class="eyebrow">BUILT TO LEARN TOGETHER</p>
-      <h2>A more accessible way into astronomy</h2>
-      <p>SAGAN aims to make astronomy understandable through plain language, structured chapters, meaningful descriptions, and optional audio. We welcome students, educators, astronomers, accessibility testers, and open-source contributors from around the world.</p>
-      <div class="about-cards">
-        <article>
-          <h3>Learn step by step</h3>
-          <p>Build from basic concepts toward light curves, exoplanets, stellar science, and astronomy data.</p>
-        </article>
-        <article>
-          <h3>More than a picture</h3>
-          <p>Charts have text descriptions, controls work with a keyboard, and audio is optional.</p>
-        </article>
-        <article>
-          <h3>Open to contributors</h3>
-          <p>Help improve lessons, accessibility, scientific references, translations, and sonification experiments.</p>
-        </article>
-      </div>
-      <p class="disclaimer"><strong>Scientific note:</strong> SAGAN is in development. This prototype does not connect to live mission archives and does not currently implement a trained GAN model. Scientific lessons and dataset integrations need review before being treated as authoritative.</p>
+      <p class="eyebrow">Accessibility &amp; Design</p>
+      <h2>Built for Accessible Science</h2>
+      <p class="about-summary">
+        SAGAN is developed under the International Blind Astronomy Olympiad initiative. Every chart includes text-based descriptions, full keyboard navigation, screen-reader live regions, and data sonification so students of all visual abilities can participate fully in scientific inquiry.
+      </p>
     </section>
   </main>
 
   <footer>
-    <span>© SAGAN open-source educational project</span>
-    <a href="README.md">Project documentation</a>
+    <span>International Blind Astronomy Olympiad &bull; SAGAN Project</span>
+    <a href="README.md">Documentation</a>
     <a href="CONTRIBUTING.md">Contribute</a>
   </footer>
 </body>
