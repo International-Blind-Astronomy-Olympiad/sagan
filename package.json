@@ -1,0 +1,13 @@
+{
+  "name": "sagan-educational-platform",
+  "version": "0.1.0",
+  "private": false,
+  "description": "SAGAN — accessible, chapter-based astronomy learning and data sonification",
+  "license": "MPL-2.0",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "test": "node scripts/check.js",
+    "start": "node scripts/serve.js"
+  },
+  "engines": { "node": ">=18" }
+}
